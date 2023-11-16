@@ -184,3 +184,55 @@ def getDataloader(trainset, testset, valid_size, batch_size, num_workers):
         num_workers=num_workers)
 
     return train_loader, valid_loader, test_loader
+
+def getAsccDataset(dataset):
+    num_classes = 6
+    inputs = 3
+    #transform = transforms.ToTensor()
+    transform = transforms.Compose([
+        #transforms.Grayscale(),
+        transforms.Resize((32, 32)),
+        transforms.ToTensor(),
+        ])
+    labelled = r'/media/ascc/My Passport/LF_workspace/MAE/PyTorch-BayesianCNN/asccdata/watch_data/labelled'
+    # 使用torchvision.datasets.ImageFolder读取数据集 指定train 和 test文件夹
+    trainset = torchvision.datasets.ImageFolder(labelled, transform=transform)
+    test = r'/media/ascc/My Passport/LF_workspace/MAE/PyTorch-BayesianCNN/asccdata/watch_data/test'
+    testset = torchvision.datasets.ImageFolder(test, transform=transform)
+
+    return trainset, testset, inputs, num_classes
+
+
+def getAsccDataloader(trainset, testset, valid_size, batch_size, num_workers):
+    #transform = transforms.ToTensor()
+    transform = transforms.Compose([
+        #transforms.Grayscale(),
+        transforms.Resize((32, 32)),
+        transforms.ToTensor(),
+        ])
+    labelled = r'/media/ascc/My Passport/LF_workspace/MAE/PyTorch-BayesianCNN/asccdata/watch_data/labelled'
+    # 使用torchvision.datasets.ImageFolder读取数据集 指定train 和 test文件夹
+    trainset = torchvision.datasets.ImageFolder(labelled, transform=transform)
+
+    test = r'/media/ascc/My Passport/LF_workspace/MAE/PyTorch-BayesianCNN/asccdata/watch_data/test'
+    testset = torchvision.datasets.ImageFolder(test, transform=transform)
+   
+
+
+    num_train = len(trainset)
+    indices = list(range(num_train))
+    np.random.shuffle(indices)
+    split = int(np.floor(valid_size * num_train))
+    train_idx, valid_idx = indices[split:], indices[:split]
+
+    train_sampler = SubsetRandomSampler(train_idx)
+    valid_sampler = SubsetRandomSampler(valid_idx)
+
+    train_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size,
+        sampler=train_sampler, num_workers=num_workers)
+    valid_loader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, 
+        sampler=valid_sampler, num_workers=num_workers)
+    test_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size, 
+        num_workers=num_workers)
+
+    return train_loader, valid_loader, test_loader
