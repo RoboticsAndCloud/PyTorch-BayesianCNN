@@ -1,0 +1,3 @@
+python ascc_bayesian.py --net_type 3conv3fc
+
+python main_frequentist.py --net_type=alexnet --dataset=CIFAR100

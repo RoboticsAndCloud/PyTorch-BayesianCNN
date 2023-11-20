@@ -71,8 +71,8 @@ def run(dataset, net_type):
     valid_size = cfg.valid_size
     batch_size = cfg.batch_size
 
-    trainset, testset, inputs, outputs = data.getDataset(dataset)
-    train_loader, valid_loader, test_loader = data.getDataloader(
+    trainset, testset, inputs, outputs = data.getAsccDataset(dataset)
+    train_loader, valid_loader, test_loader = data.getAsccDataloader(
         trainset, testset, valid_size, batch_size, num_workers)
     net = getModel(net_type, inputs, outputs).to(device)
 
@@ -108,7 +108,7 @@ def run(dataset, net_type):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = "PyTorch Frequentist Model Training")
-    parser.add_argument('--net_type', default='lenet', type=str, help='model')
+    parser.add_argument('--net_type', default='alexnet', type=str, help='model')
     parser.add_argument('--dataset', default='MNIST', type=str, help='dataset = [MNIST/CIFAR10/CIFAR100]')
     args = parser.parse_args()
 

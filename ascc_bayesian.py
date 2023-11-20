@@ -20,6 +20,7 @@ from models.BayesianModels.BayesianLeNet import BBBLeNet
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 def getModel(net_type, inputs, outputs, priors, layer_type, activation_type):
+    print('net_type:', net_type)
     if (net_type == 'lenet'):
         return BBBLeNet(outputs, inputs, priors, layer_type, activation_type)
     elif (net_type == 'alexnet'):

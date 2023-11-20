@@ -191,7 +191,8 @@ def getAsccDataset(dataset):
     #transform = transforms.ToTensor()
     transform = transforms.Compose([
         #transforms.Grayscale(),
-        transforms.Resize((32, 32)),
+        #transforms.Resize((32, 32)),
+        transforms.Resize((229, 229)),
         transforms.ToTensor(),
         ])
     labelled = r'/media/ascc/My Passport/LF_workspace/MAE/PyTorch-BayesianCNN/asccdata/watch_data/labelled'
@@ -207,6 +208,7 @@ def getAsccDataloader(trainset, testset, valid_size, batch_size, num_workers):
     #transform = transforms.ToTensor()
     transform = transforms.Compose([
         #transforms.Grayscale(),
+        #transforms.Resize((229, 229)),
         transforms.Resize((32, 32)),
         transforms.ToTensor(),
         ])
