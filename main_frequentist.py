@@ -86,6 +86,12 @@ def run(dataset, net_type):
     optimizer = Adam(net.parameters(), lr=lr)
     lr_sched = lr_scheduler.ReduceLROnPlateau(optimizer, patience=6, verbose=True)
     valid_loss_min = np.Inf
+
+    train_acc_arr = []
+    train_loss_arr = []
+
+    valid_acc_arr = []
+    valid_loss_arr = []
     for epoch in range(1, n_epochs+1):
 
         train_loss, train_acc = train_model(net, optimizer, criterion, train_loader)
@@ -94,6 +100,12 @@ def run(dataset, net_type):
 
         train_loss = train_loss/len(train_loader.dataset)
         valid_loss = valid_loss/len(valid_loader.dataset)
+
+        train_acc_arr.append(train_acc)
+        train_loss_arr.append(train_loss) 
+
+        valid_acc_arr.append(valid_acc)
+        valid_loss_arr.append(valid_loss) 
             
         print('Epoch: {} \tTraining Loss: {:.4f} \tTraining Accuracy: {:.4f} \tValidation Loss: {:.4f} \tValidation Accuracy: {:.4f}'.format(
             epoch, train_loss, train_acc, valid_loss, valid_acc))
@@ -104,6 +116,12 @@ def run(dataset, net_type):
                 valid_loss_min, valid_loss))
             torch.save(net.state_dict(), ckpt_name)
             valid_loss_min = valid_loss
+
+    print('{} dataset res'.format(dataset))
+    print('train_acc_arr:', train_acc_arr)
+    print('train_loss_arr:', train_loss_arr)
+    print('valid_acc_arr:', valid_acc_arr)
+    print('valid_loss_arr:', valid_loss_arr)
 
 
 if __name__ == '__main__':

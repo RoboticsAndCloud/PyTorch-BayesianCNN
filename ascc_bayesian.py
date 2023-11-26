@@ -143,7 +143,7 @@ def run(dataset, net_type):
                 valid_loss_max, valid_loss))
             torch.save(net.state_dict(), ckpt_name)
             valid_loss_max = valid_loss
-
+    print('{} dataset res ascc '.format(dataset))
     print('train_acc_arr:', train_acc_arr)
     print('train_loss_arr:', train_loss_arr)
     print('valid_acc_arr:', valid_acc_arr)

@@ -117,11 +117,23 @@ def run(dataset, net_type):
     optimizer = Adam(net.parameters(), lr=lr_start)
     lr_sched = lr_scheduler.ReduceLROnPlateau(optimizer, patience=6, verbose=True)
     valid_loss_max = np.Inf
+
+    train_acc_arr = []
+    train_loss_arr = []
+
+    valid_acc_arr = []
+    valid_loss_arr = []
     for epoch in range(n_epochs):  # loop over the dataset multiple times
 
         train_loss, train_acc, train_kl = train_model(net, optimizer, criterion, train_loader, num_ens=train_ens, beta_type=beta_type, epoch=epoch, num_epochs=n_epochs)
         valid_loss, valid_acc = validate_model(net, criterion, valid_loader, num_ens=valid_ens, beta_type=beta_type, epoch=epoch, num_epochs=n_epochs)
         lr_sched.step(valid_loss)
+
+        train_acc_arr.append(train_acc)
+        train_loss_arr.append(train_loss) 
+
+        valid_acc_arr.append(valid_acc)
+        valid_loss_arr.append(valid_loss) 
 
         print('Epoch: {} \tTraining Loss: {:.4f} \tTraining Accuracy: {:.4f} \tValidation Loss: {:.4f} \tValidation Accuracy: {:.4f} \ttrain_kl_div: {:.4f}'.format(
             epoch, train_loss, train_acc, valid_loss, valid_acc, train_kl))
@@ -132,6 +144,13 @@ def run(dataset, net_type):
                 valid_loss_max, valid_loss))
             torch.save(net.state_dict(), ckpt_name)
             valid_loss_max = valid_loss
+
+    print('{} dataset res'.format(dataset))
+    print('train_acc_arr:', train_acc_arr)
+    print('train_loss_arr:', train_loss_arr)
+    print('valid_acc_arr:', valid_acc_arr)
+    print('valid_loss_arr:', valid_loss_arr)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = "PyTorch Bayesian Model Training")
