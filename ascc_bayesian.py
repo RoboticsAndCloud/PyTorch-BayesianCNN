@@ -123,6 +123,7 @@ def run(dataset, net_type):
 
     valid_acc_arr = []
     valid_loss_arr = []
+    train_kl_arr = []
     for epoch in range(n_epochs):  # loop over the dataset multiple times
 
         train_loss, train_acc, train_kl = train_model(net, optimizer, criterion, train_loader, num_ens=train_ens, beta_type=beta_type, epoch=epoch, num_epochs=n_epochs)
@@ -133,6 +134,7 @@ def run(dataset, net_type):
 
         valid_acc_arr.append(valid_acc)
         valid_loss_arr.append(valid_loss) 
+        train_kl_arr.append(train_kl)
 
         print('Epoch: {} \tTraining Loss: {:.4f} \tTraining Accuracy: {:.4f} \tValidation Loss: {:.4f} \tValidation Accuracy: {:.4f} \ttrain_kl_div: {:.4f}'.format(
             epoch, train_loss, train_acc, valid_loss, valid_acc, train_kl))
@@ -148,6 +150,7 @@ def run(dataset, net_type):
     print('train_loss_arr:', train_loss_arr)
     print('valid_acc_arr:', valid_acc_arr)
     print('valid_loss_arr:', valid_loss_arr)
+    print('train_kl_arr:', train_kl_arr)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description = "PyTorch Bayesian Model Training")

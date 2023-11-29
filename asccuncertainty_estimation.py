@@ -31,6 +31,7 @@ def init_dataset(notmnist_dir):
     global mnist_set
     global notmnist_set
     mnist_set, _, _, _ = data.getDataset('CIFAR10')
+    mnist_set, _, _, _ = data.getDataset('MNIST')
     notmnist_set = torchvision.datasets.ImageFolder(root=notmnist_dir)
 
 
@@ -116,13 +117,13 @@ def get_sample(dataset, sample_type='mnist'):
     return sample.to(device), truth
 
 
-def run(net_type, weight_path, notmnist_dir):
+def run(net_type, weight_path, notmnist_dir, channel=1):
     init_dataset(notmnist_dir)
 
     layer_type = cfg.layer_type
     activation_type = cfg.activation_type
 
-    net = getModel(net_type, 3, 10, priors=None, layer_type=layer_type, activation_type=activation_type)
+    net = getModel(net_type, channel, 10, priors=None, layer_type=layer_type, activation_type=activation_type)
     print(weight_path)
     net.load_state_dict(torch.load(weight_path))
     net.train()
@@ -144,33 +145,33 @@ def run(net_type, weight_path, notmnist_dir):
     mnist_img.axis('off')
     mnist_img.set_title('MNIST Truth: {} Prediction: {}'.format(int(truth_mnist), int(np.argmax(pred_mnist))))
 
-    sample_notmnist, truth_notmnist = get_sample(notmnist_set, sample_type='notmnist')
-    pred_notmnist, epi_notmnist_norm, ale_notmnist_norm = get_uncertainty_per_image(net, sample_notmnist, T=25, normalized=True)
-    pred_notmnist, epi_notmnist_soft, ale_notmnist_soft = get_uncertainty_per_image(net, sample_notmnist, T=25, normalized=False)
-    notmnist_img.imshow(sample_notmnist.squeeze().cpu(), cmap='gray')
-    notmnist_img.axis('off')
-    notmnist_img.set_title('notMNIST Truth: {}({}) Prediction: {}({})'.format(
-        int(truth_notmnist), chr(65 + truth_notmnist), int(np.argmax(pred_notmnist)), chr(65 + np.argmax(pred_notmnist))))
+    #sample_notmnist, truth_notmnist = get_sample(notmnist_set, sample_type='notmnist')
+    #pred_notmnist, epi_notmnist_norm, ale_notmnist_norm = get_uncertainty_per_image(net, sample_notmnist, T=25, normalized=True)
+    #pred_notmnist, epi_notmnist_soft, ale_notmnist_soft = get_uncertainty_per_image(net, sample_notmnist, T=25, normalized=False)
+    #notmnist_img.imshow(sample_notmnist.squeeze().cpu(), cmap='gray')
+    #notmnist_img.axis('off')
+    #notmnist_img.set_title('notMNIST Truth: {}({}) Prediction: {}({})'.format(
+    #    int(truth_notmnist), chr(65 + truth_notmnist), int(np.argmax(pred_notmnist)), chr(65 + np.argmax(pred_notmnist))))
 
     x = list(range(10))
     data = pd.DataFrame({
-        'epistemic_norm': np.hstack([epi_mnist_norm, epi_notmnist_norm]),
-        'aleatoric_norm': np.hstack([ale_mnist_norm, ale_notmnist_norm]),
-        'epistemic_soft': np.hstack([epi_mnist_soft, epi_notmnist_soft]),
-        'aleatoric_soft': np.hstack([ale_mnist_soft, ale_notmnist_soft]),
+        'epistemic_norm': np.hstack([epi_mnist_norm, ale_mnist_norm]),
+        #'aleatoric_norm': np.hstack([ale_mnist_norm, ale_notmnist_norm]),
+        'epistemic_soft': np.hstack([epi_mnist_soft, ale_mnist_soft]),
+        #'aleatoric_soft': np.hstack([ale_mnist_soft, ale_notmnist_soft]),
         'category': np.hstack([x, x]),
-        'dataset': np.hstack([['MNIST']*10, ['notMNIST']*10])
+        'dataset': np.hstack([['MNIST']*10, ['nMNIST']*10])
     })
     print(data)
     sns.barplot(x='category', y='epistemic_norm', hue='dataset', data=data, ax=epi_stats_norm)
-    sns.barplot(x='category', y='aleatoric_norm', hue='dataset', data=data, ax=ale_stats_norm)
+    #sns.barplot(x='category', y='aleatoric_norm', hue='dataset', data=data, ax=ale_stats_norm)
     epi_stats_norm.set_title('Epistemic Uncertainty (Normalized)')
-    ale_stats_norm.set_title('Aleatoric Uncertainty (Normalized)')
+    #ale_stats_norm.set_title('Aleatoric Uncertainty (Normalized)')
 
     sns.barplot(x='category', y='epistemic_soft', hue='dataset', data=data, ax=epi_stats_soft)
-    sns.barplot(x='category', y='aleatoric_soft', hue='dataset', data=data, ax=ale_stats_soft)
+    #sns.barplot(x='category', y='aleatoric_soft', hue='dataset', data=data, ax=ale_stats_soft)
     epi_stats_soft.set_title('Epistemic Uncertainty (Softmax)')
-    ale_stats_soft.set_title('Aleatoric Uncertainty (Softmax)')
+    #ale_stats_soft.set_title('Aleatoric Uncertainty (Softmax)')
 
     plt.show()
 
