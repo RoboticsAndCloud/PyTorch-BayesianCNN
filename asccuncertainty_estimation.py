@@ -131,12 +131,12 @@ def run(net_type, weight_path, notmnist_dir, channel=1):
 
     fig = plt.figure()
     fig.suptitle('Uncertainty Estimation', fontsize='x-large')
-    mnist_img = fig.add_subplot(321)
-    notmnist_img = fig.add_subplot(322)
-    epi_stats_norm = fig.add_subplot(323)
-    ale_stats_norm = fig.add_subplot(324)
-    epi_stats_soft = fig.add_subplot(325)
-    ale_stats_soft = fig.add_subplot(326)
+    mnist_img = fig.add_subplot(311)
+    # notmnist_img = fig.add_subplot(322)
+    epi_stats_norm = fig.add_subplot(312)
+    # ale_stats_norm = fig.add_subplot(324)
+    epi_stats_soft = fig.add_subplot(313)
+    # ale_stats_soft = fig.add_subplot(326)
 
     sample_mnist, truth_mnist = get_sample(mnist_set)
     pred_mnist, epi_mnist_norm, ale_mnist_norm = get_uncertainty_per_image(net, sample_mnist, T=25, normalized=True)
@@ -155,22 +155,31 @@ def run(net_type, weight_path, notmnist_dir, channel=1):
 
     x = list(range(10))
     data = pd.DataFrame({
-        'epistemic_norm': np.hstack([epi_mnist_norm, ale_mnist_norm]),
+        'value_norm': np.hstack([epi_mnist_norm, ale_mnist_norm]),
         #'aleatoric_norm': np.hstack([ale_mnist_norm, ale_notmnist_norm]),
-        'epistemic_soft': np.hstack([epi_mnist_soft, ale_mnist_soft]),
+        'value_soft': np.hstack([epi_mnist_soft, ale_mnist_soft]),
         #'aleatoric_soft': np.hstack([ale_mnist_soft, ale_notmnist_soft]),
         'category': np.hstack([x, x]),
-        'dataset': np.hstack([['MNIST']*10, ['nMNIST']*10])
+        'types': np.hstack([['epi']*10, ['ale']*10])
     })
+
+    # data = pd.DataFrame({
+    #     'epistemic_norm': np.hstack([epi_mnist_norm]),
+    #     'aleatoric_norm': np.hstack([ale_mnist_norm]),
+    #     'epistemic_soft': np.hstack([epi_mnist_soft]),
+    #     'aleatoric_soft': np.hstack([ale_mnist_soft]),
+    #     'category': np.hstack([x]),
+    #     'dataset': np.hstack([['MNIST']*10])
+    # })
     print(data)
-    sns.barplot(x='category', y='epistemic_norm', hue='dataset', data=data, ax=epi_stats_norm)
+    sns.barplot(x='category', y='value_norm', hue='types', data=data, ax=epi_stats_norm)
     #sns.barplot(x='category', y='aleatoric_norm', hue='dataset', data=data, ax=ale_stats_norm)
-    epi_stats_norm.set_title('Epistemic Uncertainty (Normalized)')
+    epi_stats_norm.set_title('Uncertainty (Normalized)')
     #ale_stats_norm.set_title('Aleatoric Uncertainty (Normalized)')
 
-    sns.barplot(x='category', y='epistemic_soft', hue='dataset', data=data, ax=epi_stats_soft)
+    sns.barplot(x='category', y='value_soft', hue='types', data=data, ax=epi_stats_soft)
     #sns.barplot(x='category', y='aleatoric_soft', hue='dataset', data=data, ax=ale_stats_soft)
-    epi_stats_soft.set_title('Epistemic Uncertainty (Softmax)')
+    epi_stats_soft.set_title('Uncertainty (Softmax)')
     #ale_stats_soft.set_title('Aleatoric Uncertainty (Softmax)')
 
     plt.show()
